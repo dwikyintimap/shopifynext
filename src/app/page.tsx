@@ -1,5 +1,8 @@
 "use client";
 
+import { BestSellerCard } from "@/components/bestsellercards";
+import HappyCustomers from "@/components/customer";
+import Footer from "@/components/footer";
 import { getProducts } from "@/lib/shopify";
 import { Search, ShoppingCart, User } from "lucide-react";
 import Image from "next/image";
@@ -26,6 +29,7 @@ type Product = {
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [topCategories, setTopCategories] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
 
   useEffect(() => {
     getProducts().then(setProducts).catch(console.error);
@@ -37,8 +41,18 @@ export default function HomePage() {
         const categories = data.filter((item) =>
           item.tags.includes("top-categories")
         );
-        console.log("Top Categories:", categories);
         setTopCategories(categories);
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    getProducts()
+      .then((data) => {
+        const bestSellers = data.filter((item) =>
+          item.tags.includes("best-seller")
+        );
+        setBestSellers(bestSellers);
       })
       .catch(console.error);
   }, []);
@@ -161,6 +175,66 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="bg-[#f9f1ef] py-12">
+        <div className="max-w-screen-xl mx-auto px-6">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-4xl font-semibold text-orange-600">
+              Our Best Sellers
+            </h2>
+            <button className="text-sm bg-white shadow px-4 py-1 rounded-full font-medium">
+              View All
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
+            {bestSellers.slice(0, 4).map((item, idx) => (
+              <BestSellerCard
+                key={idx}
+                title={item.title}
+                image={item.images.edges[0]?.node.url}
+                oldPrice="199.99"
+                newPrice="109.99"
+                discount="45%"
+                rating={Math.floor(Math.random() * 5) + 1}
+                colors={["#F9E7C5", "#F4F6FC"]}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full bg-[#282828] text-white py-20">
+        <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+          {/* Text */}
+          <div className="md:w-1/3">
+            <h2 className="text-4xl md:text-5xl font-semibold leading-tight mb-6">
+              VARIED CLEANING <br /> SOLUTIONS
+            </h2>
+            <p className="text-sm md:text-base text-gray-300 leading-relaxed mb-6">
+              Explore a lineup of cutting-edge vacuums, each tailored to meet
+              your specific needs – from powerful corded models to wet & dry
+              cordless options. Our advanced technology and features are aimed
+              at delivering a spotless living space.
+            </p>
+            <button className="bg-white text-black text-sm px-6 py-3 rounded-full font-medium hover:bg-gray-200 transition">
+              Shop Now
+            </button>
+          </div>
+
+          {/* Image */}
+          <div className="md:w-2/3 w-full">
+            <Image
+              src="/images/sectionimagefull.jpg"
+              alt="Cleaning Solutions"
+              width={1200}
+              height={1000}
+              className="w-full h-auto object-contain"
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Product Section */}
       <section className="px-6 py-4">
         <h2 className="text-2xl font-semibold mb-4">Our Products</h2>
@@ -179,6 +253,10 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <HappyCustomers />
+
+      <Footer />
     </main>
   );
 }
@@ -206,16 +284,16 @@ function FeatureCard({
 function CategoryCard({ title, image }: { title: string; image: string }) {
   return (
     <div className="text-center">
-      <div className="rounded-2xl overflow-hidden mb-3 aspect-[3/4] bg-white">
+      <div className="rounded-2xl overflow-hidden mb-4 bg-white w-full h-[280px] md:h-[320px]">
         <Image
           src={image}
           alt={title}
-          width={300}
-          height={300}
+          width={400}
+          height={400}
           className="w-full h-full object-cover"
         />
       </div>
-      <h3 className="text-sm font-medium text-neutral-800">{title}</h3>
+      <h3 className="text-lg font-medium text-[#5e504e] text-left">{title}</h3>
     </div>
   );
 }
